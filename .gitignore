@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual env
+.venv/
+venv/
+
+# Exploratory lab — not part of system
+lab/
+!lab/.gitkeep
+
+# Kaggle credentials (never commit)
+.kaggle/
+kaggle.json
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
