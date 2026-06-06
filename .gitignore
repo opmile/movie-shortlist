@@ -7,9 +7,15 @@ __pycache__/
 .venv/
 venv/
 
-# Exploratory lab — not part of system
-lab/
-!lab/.gitkeep
+# ETL — versioned, build-time pipeline (scripts + snapshots + findings).
+# Snapshots committed so evaluators run without Kaggle (spec.md §13).
+# Ignore only regenerated artifacts + the aggregate→profile intermediate:
+etl/*.png
+etl/_raw_stats.json
+
+# Agent / IDE tooling — not project deliverables
+.claude/
+.antigravitycli/
 
 # Kaggle credentials (never commit)
 .kaggle/
