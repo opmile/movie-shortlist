@@ -16,7 +16,7 @@ etl/
   neighbors.py     # stage: raw + aggregated.csv → neighbors.csv (CF item-based)
   build.py         # orquestra: aggregate → profile → neighbors
   explore/         # didático/experimentos — fora do regen, sem artefato commitado
-    inspect.py     #   inspeção do raw via kagglehub (REPL)
+    inspect_raw.py     #   inspeção do raw via kagglehub (REPL)
     calibrate.py   #   varia piso do Aclamado sobre aggregated.csv
   aggregated.csv   # commitado — snapshot do acervo
   neighbors.csv    # commitado — vizinhos item-based
