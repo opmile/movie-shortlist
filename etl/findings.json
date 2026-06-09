@@ -1,0 +1,79 @@
+{
+  "cardinality": {
+    "users": 162541,
+    "movies": 58958,
+    "ratings_total": 25000095,
+    "density_pct": 0.2609
+  },
+  "anomalies": {
+    "rating_out_of_range": 0,
+    "title_no_year_rows": 13495,
+    "genre_null_rows": 0,
+    "movies_no_year": 527,
+    "movies_no_genre": 0
+  },
+  "distributions": {
+    "avg_rating": {
+      "p10": 2.090909090909091,
+      "p20": 2.5,
+      "p25": 2.6875,
+      "p50": 3.15,
+      "p75": 3.5,
+      "p90": 3.8654704548865726,
+      "p95": 4.0,
+      "p99": 5.0,
+      "min": 0.5,
+      "max": 5.0
+    },
+    "count_per_movie": {
+      "p10": 1.0,
+      "p20": 2.0,
+      "p25": 2.0,
+      "p50": 6.0,
+      "p75": 36.75,
+      "p90": 414.0,
+      "p95": 1508.0,
+      "p99": 9943.0,
+      "min": 1.0,
+      "max": 81491.0
+    },
+    "year": {
+      "p10": 1954.0,
+      "p20": 1972.0,
+      "p25": 1979.0,
+      "p50": 2003.0,
+      "p75": 2013.0,
+      "p90": 2016.0,
+      "p95": 2018.0,
+      "p99": 2019.0,
+      "min": 1874.0,
+      "max": 2019.0
+    }
+  },
+  "thresholds": {
+    "aclamado_avg": 4.0,
+    "aclamado_floor": 38,
+    "blockbuster_count": 250,
+    "cult_count_lo": 6,
+    "cult_count_hi": 37,
+    "cult_avg": 3.9,
+    "classico_year": 1970
+  },
+  "global_mean_C": 3.071398079447227,
+  "class_counts_final": {
+    "Filme": 41040,
+    "Classico": 10906,
+    "Blockbuster": 6531,
+    "Cult": 418,
+    "Aclamado": 63
+  },
+  "matrix_sizing": {
+    "dense_float32_gb": 38.332,
+    "sparse_csr_float32_mb": 200.7,
+    "item_item_float32_gb": 13.904
+  },
+  "versions": {
+    "pandas": "3.0.3",
+    "numpy": "2.4.6"
+  }
+}
