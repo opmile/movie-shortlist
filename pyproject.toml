@@ -1,0 +1,20 @@
+# Config de FERRAMENTAS apenas — as deps ficam nos requirements*.txt (não aqui).
+# Streamlit Cloud lê requirements.txt; este arquivo só configura ruff + pytest.
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+# O gate de qualidade mira o CORE DO PRODUTO (src/ + tests/), coerente com o CLAUDE.md
+# ("rigor no core POO; nenhum em etl/ scripts"). Fora do gate:
+extend-exclude = [
+  "etl",                                              # build-time, roda offline — não é produto
+  "filme.py", "catalogo.py", "main.py", "persistencia.py",  # app flat herdado, será substituído por src/shortlist/
+]
+
+[tool.ruff.lint]
+# E/W: pycodestyle, F: pyflakes, I: isort (ordena imports).
+# Identificadores em português (titulo, Catalogo, ...) são válidos — ruff não reclama disso.
+select = ["E", "F", "W", "I"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

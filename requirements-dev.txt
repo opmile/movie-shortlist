@@ -1,0 +1,6 @@
+# Deps de DESENVOLVIMENTO / CI.
+# Herda o produto e adiciona as ferramentas de qualidade.
+# O CI instala ESTE arquivo (cobre produto + dev numa tacada).
+-r requirements.txt
+pytest==9.0.3
+ruff==0.15.16

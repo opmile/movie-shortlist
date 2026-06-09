@@ -1,0 +1,38 @@
+name: CI
+
+# Gate de qualidade do trabalho colaborativo. NÃO faz deploy —
+# o deploy é cuidado pelo Streamlit Community Cloud (auto-deploy no push da main).
+# Aqui só rodamos lint + testes antes de qualquer coisa entrar na main.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13" # casa com o 3.13 local
+          cache: pip
+
+      - name: Instalar deps (produto + dev)
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Format check (ruff)
+        run: ruff format --check .
+
+      - name: Testes (pytest, tolerante a zero-testes)
+        run: |
+          # Actions roda 'bash -e': um pytest que falha abortaria o step antes do guard.
+          # '|| code=$?' captura o código sem disparar o set -e.
+          pytest && code=0 || code=$?
+          # exit 5 = "nenhum teste coletado" → ok durante a fase de discovery/spec.
+          # Quando o primeiro teste do core entrar, isto vira gate real automaticamente.
+          if [ "$code" -ne 0 ] && [ "$code" -ne 5 ]; then exit "$code"; fi

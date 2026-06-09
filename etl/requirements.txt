@@ -1,0 +1,10 @@
+# Deps de BUILD-TIME — só a pipeline ETL (etl/*.py) usa.
+# Roda UMA vez offline pra gerar os snapshots commitados (aggregated.csv, neighbors.csv).
+# NUNCA é referenciado pelo runtime do app nem pelo CI — por isso fica separado
+# do requirements.txt de produto (mantém o deploy enxuto e sem rede/Kaggle).
+pandas
+numpy
+scipy
+scikit-learn
+kagglehub
+matplotlib
