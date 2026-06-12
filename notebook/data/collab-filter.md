@@ -2,7 +2,7 @@
 
 **Data:** 2026-05-29 (CF promovido a v1 em 2026-06-05)
 
-CF item-based é a **4ª estratégia de recomendação do produto** (`RecomendaSimilar`, §8): sai de *"filmes bem avaliados"* (qualquer sort) pra *"porque você gostou de Matrix"* (relacional). O trabalho pesado — cosseno sobre a matriz esparsa de co-avaliação — roda **offline no `etl/`** e emite `neighbors.csv`; o produto só faz lookup O(1). É o que dá substância de produto à recomendação, junto do [rating bayesiano](rating-bayesiano.md) (shrinkage estatístico) no ranking por nota.
+CF item-based é a 4ª estratégia (`RecomendaSimilar`, §8): sai de *"filmes bem avaliados"* (qualquer sort) pra *"porque você gostou de Matrix"* (relacional). O trabalho pesado — cosseno sobre a matriz esparsa de co-avaliação — roda **offline no `etl/`** e emite `neighbors.csv`; o produto só faz lookup O(1). É o que dá substância de produto à recomendação, junto do [rating bayesiano](rating-bayesiano.md) (shrinkage estatístico) no ranking por nota.
 
 Esta nota documenta o raciocínio que amarra CF ao dataset raw (grão por usuário; o agregado é só o snapshot do acervo, ver §6). Progressão didática: da ideia social do CF → matriz utilidade → por que esparsa → cosseno → formatos COO/CSR/CSC → fechamento no **item-based + CSC** pro nosso caso.
 
