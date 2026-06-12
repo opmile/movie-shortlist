@@ -60,6 +60,7 @@ CSV bruto de **25M avaliações** (1.66GB) → snapshot de **58.958 filmes** (~3
 | `sum_rating` | float | soma das notas |
 | `count` | int | número de ratings (popularidade) |
 | `avg_rating` | float | `sum_rating / count` |
+| `weighted_rating` | float | rating bayesiano (shrinkage; ver `rating-bayesiano.md`) |
 
 ---
 

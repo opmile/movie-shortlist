@@ -66,11 +66,13 @@ O ETL roda **uma vez** offline e emite dois snapshots estáticos que o produto c
 ### Schema do agregado (consumido pelo sistema)
 | Coluna | Tipo |
 |---|---|
-| `title` | str |
+| `Movie_Name` | str (título-com-ano — chave de join com `neighbors.csv`) |
+| `title` | str (título limpo, sem `(YYYY)`) |
 | `year` | Int64 (nullable) |
-| `genres` | list[str] (split de pipe-separated) |
-| `avg_rating` | float |
+| `genres` | str pipe-separated (split → `list[str]` no `Filme`) |
+| `sum_rating` | float (soma das notas; intermediária de `avg_rating`) |
 | `count` | int |
+| `avg_rating` | float |
 | `weighted_rating` | float (rating bayesiano — shrinkage; ver §8) |
 
 Detalhe: `notebook/data/dataset-e-etl.md` · `notebook/data/collab-filter.md` · `notebook/data/rating-bayesiano.md`.
