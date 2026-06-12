@@ -32,13 +32,13 @@ Prior do rating bayesiano: C (média global) = **3.071**.
 
 | Subclasse | Filmes (pós-precedência) |
 |---|---|
-| Classico | 10,906 |
-| Cult | 418 |
-| Blockbuster | 6,531 |
-| Aclamado | 63 |
-| Filme | 41,040 |
+| Classico | 1,926 |
+| Cult | 474 |
+| Blockbuster | 2,709 |
+| Aclamado | 121 |
+| Filme | 53,728 |
 
-Thresholds (fonte canônica: `../notebook/data/thresholds.md`): `{'aclamado_avg': 4.0, 'aclamado_floor': 38, 'blockbuster_count': 250, 'cult_count_lo': 6, 'cult_count_hi': 37, 'cult_avg': 3.9, 'classico_year': 1970}`
+Thresholds (fonte canônica: `../notebook/data/thresholds.md`): `{'aclamado_avg': 4.0, 'aclamado_floor': 6, 'blockbuster_count': 1508, 'cult_count_lo': 6, 'cult_count_hi': 37, 'cult_avg': 3.9, 'classico_year': 1970, 'classico_count': 37}`
 
 ## 5. Matriz collaborative filtering — dimensionamento
 

@@ -2,11 +2,11 @@
 
 **Trabalho Final de POO**
 **Versão:** v1
-**Última atualização:** 2026-05-28
+**Última atualização:** 2026-06-05
 **Repositório:** `github.com/opmile/shortlist`
 
 > Este documento é a referência consolidada do projeto: **o que** será construído.
-> O **porquê** de cada decisão está em `notebook/` (`doc/`, `data/`, `engineering/`).
+> O **porquê** de cada decisão está em `notebook/` (`data/`, `engineering/`, `faq.md`).
 
 ---
 
@@ -18,12 +18,11 @@ Projeto solo, escopo enxuto, ~6-8h ativas distribuídas em 4 semanas como projet
 
 ---
 
-## 2. Propósito duplo
+## 2. Propósito
 
-1. **Acadêmico (TFD POO):** demonstrar 2 design patterns formais + herança/polimorfismo trabalhando juntos sobre problema com substância. Cada decisão arquitetural defensável na banca.
-2. **Pessoal / portfolio:** caso de estudo de engenharia — saber defender escopo, aplicar patterns, justificar arquitetura.
+**Produto de portfolio:** caso de estudo de engenharia — 2 design patterns formais (Strategy + Repository) + herança/polimorfismo sobre problema com substância, recomendação com critério (CF item-based + rating bayesiano), escopo enxuto e arquitetura justificada. É também a entrega de um Trabalho Final de POO, mas o documento descreve o **produto**, não o trabalho de curso.
 
-Detalhe: `notebook/engineering/project-definition.md`.
+Detalhe: `notebook/engineering/project-e-escopo.md`.
 
 ---
 
@@ -33,11 +32,11 @@ Detalhe: `notebook/engineering/project-definition.md`.
 Catálogo interativo de filmes com features analíticas e de recomendação. UI Streamlit. Stack pequena, decisões justificadas.
 
 ### O que NÃO é
-- ❌ ETL (a fase ETL existe em `lab/`, é one-shot, não é o produto)
+- ❌ ETL (a fase ETL existe em `etl/`, é one-shot, não é o produto)
 - ❌ Recomendador puro (recomendação é uma feature entre várias)
 - ❌ Sistema de ML (sem modelo treinado; recomendação determinística)
 - ❌ Backend / API (UI direta, sem cliente externo)
-- ❌ Aplicação de uso real (banca não vai escolher filme; é demonstração arquitetural)
+- ❌ Aplicação de uso real (ninguém escolhe filme real aqui; é demonstração arquitetural)
 
 ---
 
@@ -46,7 +45,7 @@ Catálogo interativo de filmes com features analíticas e de recomendação. UI 
 - **Linguagem:** Python 3.13
 - **Isolamento:** venv local (`.venv/`), **sem Docker**
 - **Dependências do produto:** `streamlit`, `pandas`, `matplotlib`, `plotly`, `pytest`
-- **Dependências do lab (separadas):** `kagglehub[pandas-datasets]`
+- **Dependências do ETL (separadas):** `kagglehub[pandas-datasets]`
 
 Detalhe: `notebook/engineering/stack-and-tooling.md`.
 
@@ -57,21 +56,26 @@ Detalhe: `notebook/engineering/stack-and-tooling.md`.
 ### Dataset
 `chaitanyahivlekar/large-movie-dataset` (Kaggle) — 25M ratings, 162k users, 58.958 filmes únicos.
 
-### ETL one-shot
-Script `lab/02_aggregate.py` agrega raw → `aggregated.csv` (58.958 linhas, ~3MB). Chunked groupby, ~30s, pico ~500MB RAM.
+### ETL one-shot (etl/ → snapshots)
+O ETL roda **uma vez** offline e emite dois snapshots estáticos que o produto consome:
+- `etl/aggregate.py` agrega raw → `aggregated.csv` (58.958 linhas, ~3MB). Chunked groupby, ~30s, pico ~500MB RAM. Inclui a coluna derivada `weighted_rating` (rating bayesiano — ver §8).
+- `etl/neighbors.py` relê o raw (matriz esparsa user×item, cosseno item-based) → `neighbors.csv` (top-10 vizinhos por filme; alimenta `RecomendaSimilar`). `scipy`/`scikit-learn` ficam **só no ETL**.
 
-**Princípio:** build-time vs run-time. ETL roda **uma vez** offline; sistema consome o snapshot. Sem rede, sem credencial Kaggle no produto.
+**Princípio:** build-time vs run-time. O pesado roda offline; o sistema consome os snapshots. Sem rede, sem credencial Kaggle, sem dependência de ML no produto.
 
 ### Schema do agregado (consumido pelo sistema)
 | Coluna | Tipo |
 |---|---|
-| `title` | str |
+| `Movie_Name` | str (título-com-ano — chave de join com `neighbors.csv`) |
+| `title` | str (título limpo, sem `(YYYY)`) |
 | `year` | Int64 (nullable) |
-| `genres` | list[str] (split de pipe-separated) |
-| `avg_rating` | float |
+| `genres` | str pipe-separated (split → `list[str]` no `Filme`) |
+| `sum_rating` | float (soma das notas; intermediária de `avg_rating`) |
 | `count` | int |
+| `avg_rating` | float |
+| `weighted_rating` | float (rating bayesiano — shrinkage; ver §8) |
 
-Detalhe: `notebook/data/dataset-rationale.md`, `notebook/data/etl-pipeline.md`.
+Detalhe: `notebook/data/dataset-e-etl.md` · `notebook/data/collab-filter.md` · `notebook/data/rating-bayesiano.md`.
 
 ---
 
@@ -99,15 +103,20 @@ UI (Streamlit) ── 3 telas
     │
     └──> Recomendador ABC ────► Strategy pattern
           ├── RecomendaPorGenero
-          ├── RecomendaPorNota
-          └── RecomendaPorPopularidade
+          ├── RecomendaPorNota          (ordena por weighted_rating)
+          ├── RecomendaPorPopularidade
+          └── RecomendaSimilar          (lookup item-based em neighbors.csv)
 ```
+
+`neighbors.csv` (emitido pelo ETL) é input estático de `RecomendaSimilar` — lookup O(1), zero cosseno em runtime.
 
 Detalhe: `notebook/engineering/architecture.md`.
 
 ### Fluxo
 1. **Startup:** `DataSource.carregar()` → list[dict] → `FilmeFactory.criar()` → `Filme` (subclasse apropriada) → `Catalogo.adicionar()`
 2. **Uso:** UI → camada (`Catalogo` / `Analisador` / `Recomendador`) → list[Filme] → render
+
+O startup é fixado por `@st.cache_resource` em `build_catalogo()` (roda 1× e persiste entre reruns do Streamlit, que re-executa o script a cada interação); parse de `aggregated.csv`/`neighbors.csv` via `@st.cache_data`. Built-in do streamlit — nenhuma dep nova. Mecânica e os 3 sentidos de "cache" em `notebook/engineering/architecture.md` · `notebook/data/dataset-e-etl.md`.
 
 ---
 
@@ -122,11 +131,13 @@ class Recomendador(ABC):
 
 class RecomendaPorGenero(Recomendador):
     def __init__(self, genero_alvo: str): ...
-class RecomendaPorNota(Recomendador): ...
-class RecomendaPorPopularidade(Recomendador): ...
+class RecomendaPorNota(Recomendador): ...          # sort por weighted_rating
+class RecomendaPorPopularidade(Recomendador): ...  # sort por count
+class RecomendaSimilar(Recomendador):              # lookup item-based em neighbors.csv
+    def __init__(self, titulo_alvo: str): ...
 ```
 
-Algoritmos diferentes (filter vs sort por chave A vs sort por chave B), mesmo contrato. UI escolhe estratégia em runtime (dropdown).
+Algoritmos diferentes (filtro vs sort por chave vs lookup de vizinhos), mesmo contrato. UI escolhe estratégia em runtime (dropdown). `RecomendaSimilar` só consulta `neighbors.csv` (pré-computado no ETL) — o cosseno não roda no produto. Detalhe: `notebook/data/collab-filter.md`.
 
 ### 7.2 Repository — `DataSource`
 
@@ -143,9 +154,12 @@ class JSONDataSource(DataSource):
 
 Retorna `list[dict]` (não `list[Filme]`) — separação: DataSource não conhece subclasses; FilmeFactory decide.
 
+**JSON = mesmos dados agregados, formato JSON** (o ETL emite `aggregated.json` junto do `.csv`), não um dataset diferente. Repository desacopla **formato/origem**, não **distribuição**: os thresholds do FilmeFactory são calibrados a *este* dataset; fonte com distribuição diferente exigiria recalibração por fonte. Detalhe: `notebook/engineering/design-patterns.md`.
+
 ### O que NÃO é pattern formal
 - **Factory** — `FilmeFactory` existe como "construtor com lógica de dispatch", não trabalhado como pattern GoF
 - **Singleton, Observer, Decorator, Adapter** — não emergem naturalmente
+- **Singleton (nota):** `Catalogo` é singleton-*scoped* via `@st.cache_resource` (lifecycle de infra — mesma instância entre reruns), **não** Singleton GoF (classe não se policia, construtor público, testável). Mecanismo de framework, não pattern. Detalhe: `notebook/engineering/design-patterns.md`
 
 Detalhe: `notebook/engineering/design-patterns.md`.
 
@@ -173,19 +187,26 @@ class Filme:
 - `FilmeCult` — pondera nicho (count médio, avg alto)
 - `Classico` — bônus por antiguidade
 
-### Thresholds calibrados (do lab)
-| Subclasse | Critério |
-|---|---|
-| `Classico` | `year ≤ 1970` |
-| `FilmeCult` | `count ∈ [6, 37] ∧ avg_rating ≥ 3.9` |
-| `Blockbuster` | `count ≥ p95 (~250)` |
-| `FilmeAclamado` | `avg_rating ≥ 4.0` |
-| `Filme` (base) | fallback |
+### Thresholds calibrados (do ETL)
+| Subclasse | Critério | Estimativa |
+|---|---|---|
+| `Classico` | `year ≤ 1970 ∧ count ≥ 37` | ~1.9k |
+| `FilmeCult` | `count ∈ [6, 37] ∧ avg_rating ≥ 3.9` | ~474 |
+| `Blockbuster` | `count ≥ p95 (1508)` | ~2.7k |
+| `FilmeAclamado` | `avg_rating ≥ 4.0 ∧ count ≥ 6` | ~121 |
+| `Filme` (base) | fallback | ~53.7k (~91%) |
+
+> Calibração refinada em `etl/explore/calibrate.py` (2026-05-28): pisos de `count` no Aclamado (`≥6`, mata ruído de poucos votos) e no Classico (`≥37`, exige reconhecimento — idade não basta); Blockbuster em p95 real (1508, não ~250). Detalhe: `notebook/data/thresholds.md`.
 
 ### Precedência (FilmeFactory aplica em ordem)
 `Classico > FilmeCult > Blockbuster > FilmeAclamado > Filme`
 
 Detalhe: `notebook/data/thresholds.md`.
+
+### Métricas derivadas (emitidas pelo ETL, separadas de `calcular_score`)
+
+- **`weighted_rating` (rating bayesiano):** *weighted rating* (shrinkage) `WR = (v/(v+m))·R + (m/(v+m))·C`, com `m`=p75 do `count`=37 e `C`=média global. Puxa a média de poucos votos pro prior global, corrigindo o ruído de baixa amostra (um filme de 1 voto e nota 5.0 não lidera o ranking). Usado por `RecomendaPorNota` e na ordenação da tela Acervo. **Não** entra no `calcular_score` das subclasses (que é o eixo de *personalidade*); é uma correção de *confiança* ortogonal. Detalhe: `notebook/data/rating-bayesiano.md`.
+- **`neighbors` (collaborative filtering):** top-10 vizinhos item-based por filme (cosseno sobre co-avaliação, computado offline no ETL → `neighbors.csv`). Schema **tidy** `Movie_Name, rank, vizinho, sim` (uma linha por par; chave = `Movie_Name`, mesma do `aggregated.csv`; carrega o score `sim`). Produto lê 1×, indexa por `groupby` → dict, lookup O(1). Alimenta `RecomendaSimilar`. Determinístico, sem modelo treinado, sem ML em runtime. Detalhe: `notebook/data/collab-filter.md`.
 
 ---
 
@@ -202,42 +223,28 @@ Detalhe: `notebook/data/thresholds.md`.
 | `Recomendador` + estratégias | ✅ (parametrizado) |
 | `Analisador` | ⚠️ minimal (só boundary) |
 | Streamlit UI | ❌ |
-| `lab/` scripts | ❌ |
+| `etl/` scripts | ❌ |
 
 `pytest` + `parametrize` pra demonstrar Strategy/Repository diretamente no teste.
 
-Detalhe: `notebook/engineering/tdd-scope.md`.
+Detalhe: `notebook/engineering/tdd-e-workflow.md`.
 
 ---
 
 ## 10. Fora de escopo (v1)
 
-- **Collaborative filtering** — análise feita no lab, dimensionamento OK (sparse 200MB). Deferred to v2. Ver `notebook/data/collab-filter-deferred.md`.
+- **ML / modelo treinado em runtime** — a recomendação é determinística. O collaborative filtering é álgebra linear (cosseno) computada **offline no ETL**; o produto só faz lookup. Sem treino, sem inferência no request path.
 - **Content-based via TF-IDF** — dataset não tem texto rico (sem `overview`).
-- **`KaggleDataSource` em runtime** — ETL é one-shot no `lab/`.
+- **`KaggleDataSource` em runtime** — ETL é one-shot no `etl/`.
 - **Factory pattern formal** — `FilmeFactory` é construtor com dispatch, não trabalhado como pattern.
 - **`FilmeNacional`, `Documentario`, `Serie`** — dataset não tem `country`/`language`/tipo distinto suficiente.
-- **Banco de dados, autenticação, API REST, ML, Docker, deploy.**
+- **Banco de dados, autenticação, API REST, Docker, deploy.**
 
 ---
 
-## 11. Cronograma — 4 semanas
+## 11. Critério de pronto
 
-| Semana | Janela | Entregas | Marco |
-|---|---|---|---|
-| **S1** | 26/05–01/06 | Setup repo, `Filme` + subclasses, `Catalogo` | Catalogo polimórfico funcional via script |
-| **S2** | 02/06–08/06 | `DataSource` ABC + CSV + JSON, `FilmeFactory` | Troca de fonte sem mexer no resto |
-| **S3** | 09/06–15/06 | `Analisador`, `Recomendador` + 3 estratégias | Análise + recomendação rodando no REPL |
-| **S4** | 16/06–22/06 | Streamlit 3 telas + polimento + slides | App end-to-end + ensaio |
-| **Buffer** | 23–26/06 | Bugfix, polimento extra | — |
-
-Workflow por camada: conceito → contrato → TDD → implementação Claude → revisão. Detalhe: `notebook/engineering/workflow.md`.
-
----
-
-## 12. Critério de pronto
-
-Avaliador deve conseguir, em ambiente limpo:
+Em ambiente limpo, deve-se conseguir:
 
 ```bash
 git clone https://github.com/opmile/shortlist
@@ -249,16 +256,16 @@ python3 -m venv .venv
 
 E:
 1. App abre sem erros
-2. Tela Acervo lista filmes filtravelmente
+2. Tela Acervo lista filmes filtravelmente, com `weighted_rating` (nota ajustada) ao lado da média crua
 3. Tela Estatísticas renderiza gráficos
-4. Tela Recomendações permite trocar estratégia e ver resultado
+4. Tela Recomendações permite trocar entre as 4 estratégias — incluindo `RecomendaSimilar` ("porque você gostou de X") — e ver resultado
 5. Testes passam: `.venv/bin/pytest tests/ -v`
 
 Tudo além disso é polimento.
 
 ---
 
-## 13. Estrutura de pastas (proposta)
+## 12. Estrutura de pastas (proposta)
 
 ```
 shortlist/
@@ -269,7 +276,7 @@ shortlist/
 │   ├── factory.py
 │   ├── datasource.py       # ABC + CSV + JSON
 │   ├── analisador.py
-│   ├── recomendador.py     # ABC + 3 estratégias
+│   ├── recomendador.py     # ABC + 4 estratégias (inclui RecomendaSimilar)
 │   └── app.py              # entry Streamlit
 ├── tests/
 │   ├── conftest.py
@@ -278,14 +285,10 @@ shortlist/
 │   ├── test_datasource.py
 │   ├── test_factory.py
 │   └── test_recomendador.py
-├── lab/                    # exploração + ETL (gitignored exceto findings + aggregated)
-│   ├── 01_load_kaggle.py
-│   ├── 02_aggregate.py
-│   ├── findings.md
-│   └── aggregated.csv      # commitado pro avaliador rodar sem Kaggle
+├── etl/                    # pipeline build-time — estrutura/uso em etl/README.md
 ├── notebook/               # raciocínio do projeto (commitado)
 │   ├── README.md
-│   ├── doc/
+│   ├── faq.md
 │   ├── data/
 │   └── engineering/
 ├── .venv/                  # gitignored
@@ -297,6 +300,6 @@ shortlist/
 
 ---
 
-## 14. Próximo passo
+## 13. Próximo passo
 
 Plan de implementação via skill `superpowers:writing-plans` — traduz spec em sequência executável de tarefas, branch por camada, ordem de entrega.
