@@ -18,12 +18,13 @@ CHUNK_SIZE = 500_000
 # Não editar números aqui sem refletir lá.
 THRESHOLDS = {
     "aclamado_avg": 4.0,
-    "aclamado_floor": 38,      # piso de count pro Aclamado (mata ruído de poucos votos)
-    "blockbuster_count": 250,
+    "aclamado_floor": 6,       # p50 — piso de count pro Aclamado (mata ruído de poucos votos)
+    "blockbuster_count": 1508,  # p95 — top 5% de popularidade
     "cult_count_lo": 6,
     "cult_count_hi": 37,
     "cult_avg": 3.9,
     "classico_year": 1970,
+    "classico_count": 37,      # p75 — reconhecimento (velho ≠ clássico)
 }
 
 # Piso de votos do rating bayesiano (p75 do count). Ver notebook/data/rating-bayesiano.md.
@@ -65,5 +66,10 @@ def classify(df: pd.DataFrame, aclamado_floor: int | None = None) -> pd.Series:
     )
     cls[mask_cult] = "Cult"
 
-    cls[df["year"].notna() & (df["year"] <= th["classico_year"])] = "Classico"
+    mask_classico = (
+        df["year"].notna()
+        & (df["year"] <= th["classico_year"])
+        & (df["count"] >= th["classico_count"])
+    )
+    cls[mask_classico] = "Classico"
     return cls

@@ -52,20 +52,21 @@
   },
   "thresholds": {
     "aclamado_avg": 4.0,
-    "aclamado_floor": 38,
-    "blockbuster_count": 250,
+    "aclamado_floor": 6,
+    "blockbuster_count": 1508,
     "cult_count_lo": 6,
     "cult_count_hi": 37,
     "cult_avg": 3.9,
-    "classico_year": 1970
+    "classico_year": 1970,
+    "classico_count": 37
   },
   "global_mean_C": 3.071398079447227,
   "class_counts_final": {
-    "Filme": 41040,
-    "Classico": 10906,
-    "Blockbuster": 6531,
-    "Cult": 418,
-    "Aclamado": 63
+    "Filme": 53728,
+    "Classico": 1926,
+    "Blockbuster": 2709,
+    "Cult": 474,
+    "Aclamado": 121
   },
   "matrix_sizing": {
     "dense_float32_gb": 38.332,
