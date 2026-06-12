@@ -1,43 +1,38 @@
 # Notebook — registro de raciocínio do projeto
 
-Pasta dedicada ao histórico de decisões, conversas e fundamentos do projeto `shortlist`. Diferente de `lab/` (exploração técnica) e de `spec.md` (especificação consolidada), aqui mora o **porquê** — argumentos, alternativas consideradas, racional de cortes de escopo, conceitos discutidos.
+Histórico de decisões e fundamentos do projeto `shortlist`. Diferente de `etl/` (exploração técnica/ETL) e de `spec.md` (especificação consolidada, o **quê**), aqui mora o **porquê** — argumentos, alternativas consideradas, racional de cortes de escopo, conceitos discutidos.
 
-Lê pra:
-- Entender por que o projeto é como é
-- Retomar contexto em sessões futuras com Claude
-- Defender decisões na banca
-- Reproduzir o raciocínio em projetos futuros
+Lê pra: entender por que o projeto é como é · retomar contexto em sessões futuras · justificar decisões em portfolio/entrevista · reproduzir o raciocínio em projetos futuros.
 
 ---
 
-## Estrutura
+## Porta de entrada — justificativas das decisões
 
-### `doc/` — conversas e explicações
-Diálogos densos, didáticos, com argumentação completa. Salva o **raciocínio** do Claude em respostas relevantes.
+- [faq.md](faq.md) — parágrafos objetivos e autossuficientes que explicam o racional de cada decisão. Destila as notas longas. Cada resposta linka pro detalhe técnico. Concentra o racional consolidado, mantendo as notas técnicas focadas no detalhe.
 
-- [01-natureza-do-projeto-e-etl.md](doc/01-natureza-do-projeto-e-etl.md) — o que é o projeto, por que ETL, por que esse dataset
-- [02-roi-reducao-complexidade.md](doc/02-roi-reducao-complexidade.md) — análise de ROI do corte de escopo
+---
 
-### `data/` — decisões sobre dados, estatística e ETL
-- [thresholds.md](data/thresholds.md) — thresholds calibrados das subclasses + precedência
-- [dataset-rationale.md](data/dataset-rationale.md) — por que esse dataset, shape descoberto
-- [etl-pipeline.md](data/etl-pipeline.md) — chunked groupby, build vs runtime
-- [collab-filter-deferred.md](data/collab-filter-deferred.md) — collab filter analisado e adiado pra v2
+## `data/` — dados, estatística e ETL
 
-### `engineering/` — decisões de arquitetura e engenharia
-- [project-definition.md](engineering/project-definition.md) — o que o projeto é (e o que não é)
-- [design-patterns.md](engineering/design-patterns.md) — Strategy + Repository escolhidos, Factory rejeitado
-- [architecture.md](engineering/architecture.md) — camadas, fluxo de dados, princípios
-- [tdd-scope.md](engineering/tdd-scope.md) — TDD seletivo no core POO
-- [workflow.md](engineering/workflow.md) — conceito → contrato → implementação
-- [stack-and-tooling.md](engineering/stack-and-tooling.md) — venv, Python, deps, estrutura de pastas
+- [dataset-e-etl.md](data/dataset-e-etl.md) — por que esse dataset, shape/schema, trade-off do schema fino, pipeline chunked groupby, build vs runtime, anomalias
+- [thresholds.md](data/thresholds.md) — **fonte canônica** dos thresholds: distribuições/percentis, calibração das subclasses (pisos de count no Aclamado e Classico, Blockbuster em p95=1508) e precedência das guard clauses
+- [collab-filter.md](data/collab-filter.md) — collab filter item-based (4ª estratégia `RecomendaSimilar`): matriz esparsa, cosseno, COO/CSR/CSC, dimensionamento (sparse 200MB), cosseno offline no `etl/` → `neighbors.csv`
+- [rating-bayesiano.md](data/rating-bayesiano.md) — *weighted rating* (shrinkage estatístico) pra ranquear nota com confiança; conserta o ruído de poucos votos no acervo, calibrado em p75 do count
+
+## `engineering/` — arquitetura, patterns e processo
+
+- [project-e-escopo.md](engineering/project-e-escopo.md) — o que o projeto é (e não é), propósito (portfolio), ROI do corte de escopo (4 patterns → 2)
+- [architecture.md](engineering/architecture.md) — camadas, contratos, fluxo de dados startup/runtime, encapsulamento do Analisador, código + precedência do FilmeFactory
+- [design-patterns.md](engineering/design-patterns.md) — Strategy + Repository, FilmeFactory como factory-like (não GoF), DataSource dual, Repository desacopla formato mas não distribuição
+- [tdd-e-workflow.md](engineering/tdd-e-workflow.md) — TDD seletivo no core POO + fluxo conceito → contrato → implementação
+- [stack-and-tooling.md](engineering/stack-and-tooling.md) — Python, venv, deps, estrutura de pastas, git
 
 ---
 
 ## Convenção
 
 - Notas datadas no topo
-- Português pra prosa, código em snippets quando ajuda
+- Português pra prosa, termos técnicos em inglês; código em snippets quando ajuda
 - Linkagem entre notas via path relativo (`[texto](../pasta/file.md)`)
-- Atualizar ao invés de criar duplicata
-- Quando uma decisão muda, **manter histórico** (riscar ou adicionar seção "atualização YYYY-MM-DD")
+- Atualizar ao invés de criar duplicata; thresholds só em `data/thresholds.md` (resto cross-referencia)
+- Quando uma decisão muda, **atualizar in-place** refletindo o estado atual; reescrever a afirmação obsoleta, não anexar seção datada de histórico

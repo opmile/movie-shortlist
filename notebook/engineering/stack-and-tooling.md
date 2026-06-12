@@ -37,24 +37,25 @@ plotly             # gráficos interativos no Streamlit (opcional)
 pytest             # testes
 ```
 
-**Não usadas (intencional):**
-- ❌ `scipy` — collab filtering deferred to v2
-- ❌ `scikit-learn` — content-based deferred (sem texto rico no dataset)
-- ❌ `tensorflow` / `pytorch` — overkill pra POO TFD
+**Não usadas no produto (intencional):**
+- ❌ `scipy` / `scikit-learn` — usados **só no `etl/`** (cosseno item-based do CF, offline). Ficam fora do `requirements.txt` do produto por design: o produto só lê `neighbors.csv`, então "sem ML/dep pesada em runtime" é literal. Detalhe: `../data/collab-filter.md`.
+- ❌ `tensorflow` / `pytorch` — não há modelo treinado em lugar nenhum (CF é álgebra linear, não ML).
 - ❌ `numpy` direto — pandas já puxa transitivamente
-- ❌ `kagglehub` — só no `lab/`, não em runtime
+- ❌ `kagglehub` — só no `etl/`, não em runtime
 
 ---
 
-## Dependências do `lab/` (separadas)
+## Dependências do `etl/` (separadas)
 
 ```
 kagglehub[pandas-datasets]   # download de dataset
 pandas                       # agregação
+scipy                        # matriz esparsa (CSR/CSC) do CF
+scikit-learn                 # cosine_similarity item-based do CF
 matplotlib                   # plots exploratórios
 ```
 
-`lab/` tem ciclo de vida independente — pode ter venv próprio ou compartilhar o do produto. Decisão atual: compartilhar (`.venv/` único).
+`scipy`/`scikit-learn` vivem **só aqui**: o cosseno do collaborative filtering roda offline e emite `neighbors.csv`. O produto não os importa. `etl/` tem ciclo de vida independente — pode ter venv próprio ou compartilhar o do produto. Decisão atual: compartilhar (`.venv/` único).
 
 ---
 
@@ -69,12 +70,14 @@ plotly
 pytest
 ```
 
-**`requirements-lab.txt`** (opcional, futuro) — deps de `lab/`:
+**`requirements-etl.txt`** (opcional, futuro) — deps de `etl/`:
 ```
 kagglehub[pandas-datasets]
+scipy
+scikit-learn
 ```
 
-Manter separação evita poluir `requirements.txt` do produto com deps de ETL.
+Manter separação evita poluir `requirements.txt` do produto com deps de ETL/CF — e é o que preserva a claim "sem ML em runtime".
 
 ---
 
@@ -89,7 +92,7 @@ shortlist/
 │   ├── factory.py
 │   ├── datasource.py       # ABC + 2 impls
 │   ├── analisador.py
-│   ├── recomendador.py     # ABC + 3 estratégias
+│   ├── recomendador.py     # ABC + 4 estratégias (inclui RecomendaSimilar)
 │   └── app.py              # entry Streamlit
 ├── tests/
 │   ├── conftest.py
@@ -98,13 +101,9 @@ shortlist/
 │   ├── test_datasource.py
 │   ├── test_factory.py
 │   └── test_recomendador.py
-├── lab/                    # ETL + exploração (gitignored exceto findings)
-│   ├── 01_load_kaggle.py
-│   ├── 02_aggregate.py
-│   ├── findings.md
-│   └── aggregated.csv      # commitar! avaliador roda sem Kaggle
+├── etl/                    # pipeline build-time — estrutura/uso em etl/README.md
 ├── notebook/               # documentação de raciocínio (commitado)
-│   ├── doc/
+│   ├── faq.md
 │   ├── data/
 │   └── engineering/
 ├── .venv/                  # gitignored
@@ -116,7 +115,7 @@ shortlist/
 
 **Decisões pendentes:**
 - Nome do pacote interno (`movie_manager`, `shortlist`, ou direto na raiz sem `src/`?)
-- Commitar `aggregated.csv` ou regenerar via lab? (Ver `notebook/data/etl-pipeline.md`)
+- Commitar `aggregated.csv` ou regenerar via ETL? (Ver `notebook/data/dataset-e-etl.md`)
 
 ---
 
@@ -124,7 +123,7 @@ shortlist/
 
 - **Repo principal:** `github.com/opmile/shortlist` (origin, público)
 - **Repo upstream:** repo original do grupo (push final no fim do projeto)
-- **Branch workflow:** branch por feature/camada, PRs revisados antes do merge na `main` (histórico vira material de defesa)
+- **Branch workflow:** branch por feature/camada, PRs revisados antes do merge na `main` (histórico documenta o racional de cada mudança)
 - **Convenção de commit:** sem prefixo formal — mensagem clara e descritiva (escopo solo dispensa Conventional Commits)
 
 ---
@@ -132,7 +131,7 @@ shortlist/
 ## Auth Kaggle
 
 - **Modo:** novo formato `~/.kaggle/access_token` (KGAT_*)
-- **Local:** apenas no `lab/`, nunca em runtime do produto
+- **Local:** apenas no `etl/`, nunca em runtime do produto
 - **Segurança:** token gerenciado fora do repo, nunca commitado
 
 ---
@@ -156,4 +155,4 @@ python3 -m venv .venv
 .venv/bin/streamlit run src/movie_manager/app.py
 ```
 
-4 comandos, sem credencial Kaggle, sem download de 1.66GB. Pré-requisito: `aggregated.csv` commitado (ou instruções de regeneração via `lab/02_aggregate.py` no README).
+4 comandos, sem credencial Kaggle, sem download de 1.66GB. Pré-requisito: `aggregated.csv` commitado (ou regeneração via `etl/build.py` — ver `etl/README.md`).

@@ -1,6 +1,6 @@
 # Guia de leitura — como absorver o projeto `shortlist`
 
-Esse projeto tem muitos artefatos: spec, notebook (9 arquivos), etl, código. Sem ordem, vira labirinto. Esse arquivo é a **trilha pedagógica** pra ler com retorno máximo, sem perder tempo conectando peças.
+Esse projeto tem muitos artefatos: spec, notebook, etl, código. Sem ordem, vira labirinto. Esse arquivo é a **trilha pedagógica** pra ler com retorno máximo, sem perder tempo conectando peças.
 
 ---
 
@@ -11,8 +11,8 @@ Cada artefato tem **função distinta**:
 | Artefato | Função | Quando ler |
 |---|---|---|
 | `spec.md` | O QUÊ — referência consolidada | Primeira leitura, ou quando precisa lembrar do escopo |
-| `notebook/` | POR QUÊ — raciocínio justificado | Quando vai mexer numa decisão / defender na banca |
-| `etl/` | PIPELINE — ETL build-time + snapshots | Quando vai mexer em dados / ETL / retomar collab filter |
+| `notebook/` | POR QUÊ — raciocínio justificado | Quando vai mexer numa decisão / revisar o racional |
+| `etl/` | PIPELINE — ETL build-time + snapshots | Quando vai mexer em dados / ETL |
 | `src/` | IMPLEMENTAÇÃO — código vivo | Quando vai codar |
 | `tests/` | CONTRATO VERIFICÁVEL | Quando muda comportamento |
 | `CONTRIBUTING.md` | COMO COLABORAR — branch, PR, CI | Antes do primeiro PR / ao entrar no grupo |
@@ -51,11 +51,10 @@ Saída: você sabe de onde vem `aggregated.csv` e o que está nele.
 
 Saída: você sabe **como** vai trabalhar no projeto.
 
-### Fase 5 — Munição de banca (10 min, opcional)
-11. **`notebook/faq.md`** — parágrafos objetivos que justificam cada decisão, prontos pra defender
-12. **`notebook/data/collab-filter-deferred.md`** — análise do que foi adiado pra v2
+### Fase 5 — Racional consolidado (10 min, opcional)
+11. **`notebook/faq.md`** — parágrafos objetivos que explicam cada decisão
 
-Saída: você tem munição de banca pra perguntas tipo "por que essa escolha?"
+Saída: você tem o racional pronto pra perguntas tipo "por que essa escolha?"
 
 ---
 
@@ -69,7 +68,7 @@ Foco em retomar contexto sem ler tudo de novo.
 3. `notebook/data/thresholds.md`
 4. Último commit (`git log -5`)
 
-### Avaliador / banca (20 min)
+### Avaliador (20 min)
 Foco em entender e ter pra perguntar.
 
 1. `README.md`
@@ -88,11 +87,6 @@ Foco em ter contrato + conceito frescos.
 Foco em internalizar raciocínio.
 
 Trilha principal completa, no ritmo. `faq.md` no fim consolida o "porquê" de cada decisão.
-
-### Pra retomar collab filter (v2, futuro) (20 min)
-1. `notebook/data/collab-filter-deferred.md`
-2. `etl/findings.md` (dimensionamento da matriz)
-3. `etl/aggregated.csv` (input pra reusar)
 
 ---
 
@@ -155,7 +149,7 @@ Fazer:
 | Atividade | Tempo de leitura prep | Tempo de trabalho |
 |---|---|---|
 | Codar uma camada nova | ~15min | ~45-60min |
-| Defender camada na banca | ~30min | — |
+| Revisar uma decisão de camada | ~30min | — |
 | Retomar projeto após 1 semana | ~10min | depende |
 | Refatorar uma decisão | ~20min | ~30-60min |
 
