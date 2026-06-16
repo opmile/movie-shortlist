@@ -1,0 +1,9 @@
+Movie_Name,title,year,genres,sum_rating,count,avg_rating,weighted_rating
+Old Classic (1965),Old Classic,1965.0,Drama,210.0,50,4.2,4.0
+Niche Cult (2001),Niche Cult,2001.0,Horror,82.0,20,4.1,3.7
+Big Hit (2009),Big Hit,2009.0,Action,7600.0,2000,3.8,3.8
+Quiet Gem (2015),Quiet Gem,2015.0,Drama,430.0,100,4.3,4.1
+Meh Movie (2018),Meh Movie,2018.0,Comedy,128.0,40,3.2,3.2
+Obscure (2020),Obscure,2020.0,Drama,7.0,2,3.5,3.0
+Action Two (2011),Action Two,2011.0,Action|Thriller,6240.0,1600,3.9,3.9
+Drama Three (1999),Drama Three,1999.0,Drama,1110.0,300,3.7,3.7

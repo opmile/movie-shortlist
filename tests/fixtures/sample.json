@@ -1,0 +1,10 @@
+[
+  {"Movie_Name": "Old Classic (1965)", "title": "Old Classic", "year": 1965.0, "genres": "Drama", "sum_rating": 210.0, "count": 50, "avg_rating": 4.2, "weighted_rating": 4.0},
+  {"Movie_Name": "Niche Cult (2001)", "title": "Niche Cult", "year": 2001.0, "genres": "Horror", "sum_rating": 82.0, "count": 20, "avg_rating": 4.1, "weighted_rating": 3.7},
+  {"Movie_Name": "Big Hit (2009)", "title": "Big Hit", "year": 2009.0, "genres": "Action", "sum_rating": 7600.0, "count": 2000, "avg_rating": 3.8, "weighted_rating": 3.8},
+  {"Movie_Name": "Quiet Gem (2015)", "title": "Quiet Gem", "year": 2015.0, "genres": "Drama", "sum_rating": 430.0, "count": 100, "avg_rating": 4.3, "weighted_rating": 4.1},
+  {"Movie_Name": "Meh Movie (2018)", "title": "Meh Movie", "year": 2018.0, "genres": "Comedy", "sum_rating": 128.0, "count": 40, "avg_rating": 3.2, "weighted_rating": 3.2},
+  {"Movie_Name": "Obscure (2020)", "title": "Obscure", "year": 2020.0, "genres": "Drama", "sum_rating": 7.0, "count": 2, "avg_rating": 3.5, "weighted_rating": 3.0},
+  {"Movie_Name": "Action Two (2011)", "title": "Action Two", "year": 2011.0, "genres": "Action|Thriller", "sum_rating": 6240.0, "count": 1600, "avg_rating": 3.9, "weighted_rating": 3.9},
+  {"Movie_Name": "Drama Three (1999)", "title": "Drama Three", "year": 1999.0, "genres": "Drama", "sum_rating": 1110.0, "count": 300, "avg_rating": 3.7, "weighted_rating": 3.7}
+]
