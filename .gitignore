@@ -16,6 +16,8 @@ etl/_raw_stats.json
 # Agent / IDE tooling — not project deliverables
 .claude/
 .antigravitycli/
+CLAUDE.md
+docs/superpowers/
 
 # Kaggle credentials (never commit)
 .kaggle/
