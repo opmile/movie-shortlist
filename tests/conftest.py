@@ -25,5 +25,6 @@ def catalogo(sample_csv_path):
     from shortlist.catalogo import Catalogo
     from shortlist.datasource import CSVDataSource
     from shortlist.factory import FilmeFactory
+
     filmes = [FilmeFactory.criar(d) for d in CSVDataSource(sample_csv_path).carregar()]
     return Catalogo(filmes)

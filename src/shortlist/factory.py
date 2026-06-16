@@ -4,6 +4,7 @@ NÃO é Factory GoF: é parse de dict + escolha de subclasse em ordem estrita.
 Thresholds espelhados de etl/core.py (que não é importável em runtime — puxa
 kagglehub). Fonte canônica dos números: notebook/data/thresholds.md.
 """
+
 from shortlist.domain import Blockbuster, Classico, Filme, FilmeAclamado, FilmeCult
 
 THRESHOLDS = {

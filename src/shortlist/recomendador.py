@@ -4,6 +4,7 @@ Mesmo contrato (recomendar), algoritmos diferentes: filtro, sort por chave, look
 de vizinhos. RecomendaSimilar só consulta neighbors.csv (pré-computado no ETL) —
 zero cosseno em runtime.
 """
+
 import csv
 from abc import ABC, abstractmethod
 
@@ -13,8 +14,7 @@ from shortlist.domain import Filme
 
 class Recomendador(ABC):
     @abstractmethod
-    def recomendar(self, catalogo: Catalogo, n: int = 5) -> list[Filme]:
-        ...
+    def recomendar(self, catalogo: Catalogo, n: int = 5) -> list[Filme]: ...
 
 
 class RecomendaPorNota(Recomendador):

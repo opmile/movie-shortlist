@@ -5,20 +5,31 @@ from shortlist.factory import FilmeFactory
 
 
 def _d(**kw):
-    base = dict(Movie_Name="X (2000)", title="X", year="2000.0", genres="Drama",
-                sum_rating="0", count="10", avg_rating="3.0", weighted_rating="3.0")
+    base = dict(
+        Movie_Name="X (2000)",
+        title="X",
+        year="2000.0",
+        genres="Drama",
+        sum_rating="0",
+        count="10",
+        avg_rating="3.0",
+        weighted_rating="3.0",
+    )
     base.update({k: str(v) for k, v in kw.items()})
     return base
 
 
-@pytest.mark.parametrize("dados,esperado", [
-    (_d(year=1965, count=50, avg_rating=4.2), Classico),
-    (_d(year=2001, count=20, avg_rating=4.1), FilmeCult),
-    (_d(year=2009, count=2000, avg_rating=3.8), Blockbuster),
-    (_d(year=2015, count=100, avg_rating=4.3), FilmeAclamado),
-    (_d(year=2018, count=40, avg_rating=3.2), Filme),
-    (_d(year=2020, count=2, avg_rating=3.5), Filme),
-])
+@pytest.mark.parametrize(
+    "dados,esperado",
+    [
+        (_d(year=1965, count=50, avg_rating=4.2), Classico),
+        (_d(year=2001, count=20, avg_rating=4.1), FilmeCult),
+        (_d(year=2009, count=2000, avg_rating=3.8), Blockbuster),
+        (_d(year=2015, count=100, avg_rating=4.3), FilmeAclamado),
+        (_d(year=2018, count=40, avg_rating=3.2), Filme),
+        (_d(year=2020, count=2, avg_rating=3.5), Filme),
+    ],
+)
 def test_factory_dispatch_por_threshold(dados, esperado):
     assert type(FilmeFactory.criar(dados)) is esperado
 

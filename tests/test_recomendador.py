@@ -50,8 +50,13 @@ def test_carregar_vizinhos_agrupa_por_movie_name(neighbors_csv_path):
     assert v["Big Hit (2009)"] == ["Action Two (2011)", "Quiet Gem (2015)"]
 
 
-@pytest.mark.parametrize("estrategia", [
-    RecomendaPorNota(), RecomendaPorPopularidade(), RecomendaPorGenero("Drama"),
-])
+@pytest.mark.parametrize(
+    "estrategia",
+    [
+        RecomendaPorNota(),
+        RecomendaPorPopularidade(),
+        RecomendaPorGenero("Drama"),
+    ],
+)
 def test_estrategias_respeitam_contrato_n(catalogo, estrategia):
     assert len(estrategia.recomendar(catalogo, n=2)) <= 2
