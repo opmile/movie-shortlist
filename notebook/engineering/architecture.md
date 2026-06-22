@@ -68,15 +68,20 @@ Encapsula `list[Filme]`. Expõe `buscar`, `filtrar_por_genero`, `filtrar_por_cat
 ```python
 class Analisador:
     def __init__(self, catalogo: Catalogo): ...
-    def top_por_genero(self, n: int) -> dict[str, list[Filme]]
     def distribuicao_notas(self) -> pd.Series
     def media_por_categoria(self) -> dict[str, float]
+    def contagem_por_categoria(self) -> dict[str, int]
     def correlacao_ano_nota(self) -> float
 ```
 
+`contagem_por_categoria` (quantos filmes por subclasse) é a estrela da tela
+Estatísticas: visualiza o dispatch de threshold do `FilmeFactory` funcionando.
+Substituiu `top_por_genero` (tabular e sobreposto a `RecomendaPorGenero` — virava
+tabela, não gráfico).
+
 **Princípio:** pandas é detalhe interno. Ninguém fora vê `DataFrame`. Fluxo: construtor converte `list[Filme]` → `DataFrame` uma vez (guarda em `self._df` privado); cada método roda pandas no `_df`; converte resultado de volta a domínio antes de retornar. Trocar pandas → polars = reescrever só o interior.
 
-**Exceção pragmática:** métodos de plot podem vazar `pd.Series` porque matplotlib/plotly consomem direto — converter só pra reconverter seria cerimônia. A fronteira fica nos métodos de **dado de domínio**, não nos de **render**.
+**Exceção pragmática:** métodos de plot podem vazar `pd.Series` porque plotly consome direto — converter só pra reconverter seria cerimônia. A fronteira fica nos métodos de **dado de domínio**, não nos de **render**.
 
 ### 6. Recomendação — `Recomendador` ABC + estratégias (Strategy)
 
