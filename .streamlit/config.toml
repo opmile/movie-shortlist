@@ -1,0 +1,20 @@
+# Tema do produto — "Daylight Editorial" (caderno de cinema), modo dark único.
+# Tipografia (Fraunces/Inter/JetBrains Mono) é carregada via @import no CSS injetado
+# em app.py — aqui só declaramos a família que o chrome do Streamlit usa.
+
+[theme]
+base = "dark"
+font = "Inter, sans-serif"
+headingFont = "Fraunces, Georgia, serif"
+codeFont = "'JetBrains Mono', monospace"
+baseRadius = "0.7rem"
+primaryColor = "#E8654F"
+backgroundColor = "#16140F"
+secondaryBackgroundColor = "#211E16"
+textColor = "#EDE7DA"
+borderColor = "#322D22"
+linkColor = "#E8654F"
+
+[theme.sidebar]
+backgroundColor = "#1B1810"
+secondaryBackgroundColor = "#211E16"
