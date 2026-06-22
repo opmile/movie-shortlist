@@ -32,10 +32,13 @@
 ```
 streamlit          # UI
 pandas             # análise (encapsulada em Analisador)
-matplotlib         # gráficos básicos (Estatísticas)
-plotly             # gráficos interativos no Streamlit (opcional)
+plotly             # gráficos interativos da tela Estatísticas
 pytest             # testes
 ```
+
+`matplotlib` **fora do produto**: os 4 charts da tela Estatísticas são plotly
+(interativo, combina com a demo). Dep ociosa é pior que cortada — toda dep
+justifica seu lugar. matplotlib segue só no `etl/` (plots exploratórios offline).
 
 **Não usadas no produto (intencional):**
 - ❌ `scipy` / `scikit-learn` — usados **só no `etl/`** (cosseno item-based do CF, offline). Ficam fora do `requirements.txt` do produto por design: o produto só lê `neighbors.csv`, então "sem ML/dep pesada em runtime" é literal. Detalhe: `../data/collab-filter.md`.
@@ -65,7 +68,6 @@ matplotlib                   # plots exploratórios
 ```
 streamlit
 pandas
-matplotlib
 plotly
 pytest
 ```
