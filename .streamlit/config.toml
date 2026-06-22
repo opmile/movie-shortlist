@@ -1,0 +1,36 @@
+# Tema do produto — "Daylight Editorial" (caderno de cultura) com par dark.
+# O Streamlit aplica os dois modos: o usuário alterna Light/Dark/System no menu de
+# settings. Tipografia e cores de chart são globais ([theme]); cada modo redefine só
+# o que muda. As fontes (Fraunces/Inter/JetBrains Mono) são carregadas via @import no
+# CSS injetado em app.py — aqui só declaramos a família que o chrome do Streamlit usa.
+
+[theme]
+base = "light"
+font = "Inter, sans-serif"
+headingFont = "Fraunces, Georgia, serif"
+codeFont = "'JetBrains Mono', monospace"
+baseRadius = "0.7rem"
+
+[theme.light]
+primaryColor = "#C0392B"
+backgroundColor = "#F6F4EF"
+secondaryBackgroundColor = "#EFEBE2"
+textColor = "#16140F"
+borderColor = "#E6E0D4"
+linkColor = "#C0392B"
+
+[theme.dark]
+primaryColor = "#E8654F"
+backgroundColor = "#16140F"
+secondaryBackgroundColor = "#211E16"
+textColor = "#EDE7DA"
+borderColor = "#322D22"
+linkColor = "#E8654F"
+
+[theme.light.sidebar]
+backgroundColor = "#EFEBE2"
+secondaryBackgroundColor = "#F6F4EF"
+
+[theme.dark.sidebar]
+backgroundColor = "#1B1810"
+secondaryBackgroundColor = "#211E16"
