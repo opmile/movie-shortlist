@@ -38,11 +38,13 @@ class RecomendaPorGenero(Recomendador):
 
 class RecomendaSimilar(Recomendador):
     """
-    RecomendaSimilar recebe um filme-alvo e um mapa de vizinhança pré-computado no ETL ({filme: 
+    RecomendaSimilar recebe um filme-alvo e um mapa de vizinhança
+    pré-computado no ETL ({filme:
     [parecidos em ordem]}), pega os n filmes mais parecidos com o alvo nesse mapa, traduz esses
     nomes nos objetos Filme do catálogo (pulando os que não existirem) e devolve a lista — puro
     lookup, zero cálculo de similaridade em runtime.
     """
+
     def __init__(self, titulo_alvo: str, vizinhos: dict[str, list[str]]):
         self.titulo_alvo = titulo_alvo
         self.vizinhos = vizinhos
@@ -55,8 +57,9 @@ class RecomendaSimilar(Recomendador):
 
 def carregar_vizinhos(path: str) -> dict[str, list[str]]:
     """Lê neighbors.csv (tidy: Movie_Name, rank, vizinho, sim) → dict ordenado por rank.
-        Agrupa as linhas por filme acumulando tuplas (rank, vizinho), depois ordena cada grupo por rank e
-        descarta o rank — devolvendo o dict {filme: [vizinhos em ordem de proximidade]} que RecomendaSimilar consome.
+    Agrupa as linhas por filme acumulando tuplas (rank, vizinho), depois ordena
+    cada grupo por rank e descarta o rank — devolvendo o dict {filme:
+    [vizinhos em ordem de proximidade]} que RecomendaSimilar consome.
     """
     linhas: dict[str, list[tuple[int, str]]] = {}
     with open(path, newline="", encoding="utf-8") as f:
