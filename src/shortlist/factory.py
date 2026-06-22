@@ -5,6 +5,8 @@ Thresholds espelhados de etl/core.py (que não é importável em runtime — pux
 kagglehub). Fonte canônica dos números: notebook/data/thresholds.md.
 """
 
+from typing import Any
+
 from shortlist.domain import Blockbuster, Classico, Filme, FilmeAclamado, FilmeCult
 
 THRESHOLDS = {
@@ -38,7 +40,7 @@ class FilmeFactory:
         year = _parse_year(d.get("year"))
         count = int(float(d["count"]))
         avg = float(d["avg_rating"])
-        campos = dict(
+        campos: dict[str, Any] = dict(
             # Movie_Name: casing exata da coluna do aggregated.csv (chave de join c/ neighbors)
             movie_name=d["Movie_Name"],
             title=d["title"],

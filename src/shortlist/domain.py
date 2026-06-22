@@ -63,6 +63,8 @@ class FilmeCult(Filme):
 @dataclass
 class Classico(Filme):
     def calcular_score(self) -> float:
+        # FilmeFactory só instancia Classico quando year is not None (guarda de precedência).
+        assert self.year is not None
         return self.avg_rating + (1970 - self.year) / 100
 
     def categoria(self) -> str:
