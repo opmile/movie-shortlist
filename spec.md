@@ -113,7 +113,7 @@ UI (Streamlit) ── 3 telas
 Detalhe: `notebook/engineering/architecture.md`.
 
 ### Fluxo
-1. **Startup:** `DataSource.carregar()` → list[dict] → `FilmeFactory.criar()` → `Filme` (subclasse apropriada) → `Catalogo.adicionar()`
+1. **Startup:** `DataSource.carregar()` → list[dict] → `FilmeFactory.criar()` → `Filme` (subclasse apropriada) → `Catalogo(filmes)` (coleção read-only, injetada no construtor)
 2. **Uso:** UI → camada (`Catalogo` / `Analisador` / `Recomendador`) → list[Filme] → render
 
 O startup é fixado por `@st.cache_resource` em `build_catalogo()` (roda 1× e persiste entre reruns do Streamlit, que re-executa o script a cada interação); parse de `aggregated.csv`/`neighbors.csv` via `@st.cache_data`. Built-in do streamlit — nenhuma dep nova. Mecânica e os 3 sentidos de "cache" em `notebook/engineering/architecture.md` · `notebook/data/dataset-e-etl.md`.
@@ -134,7 +134,7 @@ class RecomendaPorGenero(Recomendador):
 class RecomendaPorNota(Recomendador): ...          # sort por weighted_rating
 class RecomendaPorPopularidade(Recomendador): ...  # sort por count
 class RecomendaSimilar(Recomendador):              # lookup item-based em neighbors.csv
-    def __init__(self, titulo_alvo: str): ...
+    def __init__(self, titulo_alvo: str, vizinhos: dict[str, list[str]]): ...  # vizinhos injetados (carregar_vizinhos)
 ```
 
 Algoritmos diferentes (filtro vs sort por chave vs lookup de vizinhos), mesmo contrato. UI escolhe estratégia em runtime (dropdown). `RecomendaSimilar` só consulta `neighbors.csv` (pré-computado no ETL) — o cosseno não roda no produto. Detalhe: `notebook/data/collab-filter.md`.
