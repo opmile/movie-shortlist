@@ -38,41 +38,23 @@ ETL = Path(__file__).resolve().parents[2] / "etl"
 AGGREGATED = str(ETL / "aggregated.csv")
 NEIGHBORS = str(ETL / "neighbors.csv")
 
-# Paletas pareadas. O dark não é inversão: fundo near-black quente (espresso, a
-# própria tinta do tema claro), texto off-white com tinta de papel, crimson
-# levantado pra bater contraste. `cat` mapeia categoria()→(fundo, texto) do badge.
-PALETTES = {
-    "light": {
-        "surface": "#FFFFFF",
-        "text": "#16140F",
-        "muted": "#8A8273",
-        "primary": "#C0392B",
-        "border": "#E6E0D4",
-        "grid": "rgba(22,20,15,.08)",
-        "chart": ["#C0392B", "#2C2920", "#C9803A", "#5A7D6A", "#9A917F"],
-        "cat": {
-            "Aclamado": ("#16140F", "#F6F4EF"),
-            "Cult": ("#C0392B", "#FFFFFF"),
-            "Blockbuster": ("#C9803A", "#FFFFFF"),
-            "Classico": ("#5A7D6A", "#FFFFFF"),
-            "Filme": ("#E7E1D4", "#403A2E"),
-        },
-    },
-    "dark": {
-        "surface": "#211E16",
-        "text": "#EDE7DA",
-        "muted": "#9A917D",
-        "primary": "#E8654F",
-        "border": "#322D22",
-        "grid": "rgba(237,231,218,.08)",
-        "chart": ["#E8654F", "#E7DFCC", "#D89A5B", "#8FB39E", "#A39A86"],
-        "cat": {
-            "Aclamado": ("#E7DFCC", "#16140F"),
-            "Cult": ("#E8654F", "#16140F"),
-            "Blockbuster": ("#D89A5B", "#16140F"),
-            "Classico": ("#8FB39E", "#16140F"),
-            "Filme": ("#2C2820", "#CFC7B4"),
-        },
+# Paleta dark única — "caderno de cinema" noturno: fundo near-black quente
+# (espresso), texto off-white com tinta de papel, crimson levantado. `cat` mapeia
+# categoria()→(fundo, texto) do badge.
+PAL = {
+    "surface": "#211E16",
+    "text": "#EDE7DA",
+    "muted": "#9A917D",
+    "primary": "#E8654F",
+    "border": "#322D22",
+    "grid": "rgba(237,231,218,.08)",
+    "chart": ["#E8654F", "#E7DFCC", "#D89A5B", "#8FB39E", "#A39A86"],
+    "cat": {
+        "Aclamado": ("#E7DFCC", "#16140F"),
+        "Cult": ("#E8654F", "#16140F"),
+        "Blockbuster": ("#D89A5B", "#16140F"),
+        "Classico": ("#8FB39E", "#16140F"),
+        "Filme": ("#2C2820", "#CFC7B4"),
     },
 }
 
@@ -80,10 +62,10 @@ _CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
 
-.block-container { padding-top: 2.4rem; max-width: 1100px; }
+.block-container { padding-top: 3.4rem; max-width: 1100px; }
 
 .sl-header { margin-bottom: 1.4rem; }
-.sl-eyebrow { font: 600 11px Inter, sans-serif; letter-spacing:.16em; text-transform:uppercase; color: __PRIMARY__; margin-bottom:.45rem; }
+.sl-eyebrow { font: 600 11px Inter, sans-serif; line-height: 1.6; letter-spacing:.16em; text-transform:uppercase; color: __PRIMARY__; margin-bottom:.4rem; padding-top:.15rem; }
 .sl-title { font: 700 44px Fraunces, serif; letter-spacing:-.02em; color: __TEXT__; line-height:1; display:flex; align-items:baseline; gap:.5rem; }
 .sl-title .dot { color: __PRIMARY__; font-size:24px; }
 .sl-sprocket { height:4px; margin:.7rem 0 .6rem; background: repeating-linear-gradient(90deg, __TEXT__ 0 3px, transparent 3px 9px); opacity:.5; border-radius:2px; }
@@ -114,12 +96,6 @@ def build_catalogo() -> Catalogo:
 @st.cache_data
 def load_vizinhos() -> dict[str, list[str]]:
     return carregar_vizinhos(NEIGHBORS)
-
-
-def _palette() -> dict:
-    theme = getattr(st.context, "theme", None)
-    modo = getattr(theme, "type", None)
-    return PALETTES.get(modo, PALETTES["light"])
 
 
 def _inject_css(pal: dict) -> None:
@@ -294,7 +270,10 @@ def tela_recomendacoes(catalogo: Catalogo, pal: dict):
         rec = RecomendaPorGenero(st.selectbox("Gênero", generos))
     else:
         titulos = sorted(f.movie_name for f in catalogo.todos())
-        alvo = st.selectbox("Filme base", titulos)
+        alvo = st.selectbox("Filme base", titulos, index=None, placeholder="Escolha um filme…")
+        if alvo is None:
+            st.info("Escolha um filme base pra ver os similares.")
+            return
         rec = RecomendaSimilar(alvo, load_vizinhos())
 
     _tabela(rec.recomendar(catalogo, n=n), pal)
@@ -302,7 +281,7 @@ def tela_recomendacoes(catalogo: Catalogo, pal: dict):
 
 def main():
     st.set_page_config(page_title="shortlist", page_icon="🎬", layout="wide")
-    pal = _palette()
+    pal = PAL
     _inject_css(pal)
     catalogo = build_catalogo()
     _header(catalogo)
