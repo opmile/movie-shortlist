@@ -5,10 +5,16 @@ Consome só as interfaces de domínio (Catalogo/Analisador/Recomendador). O star
 via plotly. Sem ML em runtime — RecomendaSimilar só faz lookup em neighbors.csv.
 """
 
+import sys
 from pathlib import Path
 
 import plotly.express as px
 import streamlit as st
+
+# src-layout: torna o pacote `shortlist` importável quando o script roda direto
+# (streamlit run src/shortlist/app.py — local e no Streamlit Cloud). pytest já
+# resolve via pythonpath=["src"] no pyproject; streamlit não lê essa config.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from shortlist.analisador import Analisador
 from shortlist.catalogo import Catalogo

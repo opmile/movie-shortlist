@@ -16,6 +16,11 @@ extend-exclude = [
 # Identificadores em português (titulo, Catalogo, ...) são válidos — ruff não reclama disso.
 select = ["E", "F", "W", "I"]
 
+[tool.ruff.lint.per-file-ignores]
+# app.py insere `src` no sys.path (shim de src-layout) antes de importar o pacote
+# shortlist; logo os imports do pacote ficam após código (E402, intencional).
+"src/shortlist/app.py" = ["E402"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
