@@ -3,6 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Tool caches / scratch — regeneráveis, nunca versionar
+.pytest_cache/
+.ruff_cache/
+.superpowers/
+
 # Virtual env
 .venv/
 venv/
