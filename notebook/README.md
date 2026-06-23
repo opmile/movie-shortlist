@@ -1,10 +1,14 @@
 # Notebook — registro de raciocínio do projeto
 
-Histórico de decisões e fundamentos do projeto `shortlist`. Diferente de `etl/` (exploração técnica/ETL) e de `spec.md` (especificação consolidada, o **quê**), aqui mora o **porquê** — argumentos, alternativas consideradas, racional de cortes de escopo, conceitos discutidos.
+Documentação do projeto `shortlist`: a especificação consolidada mais o registro de raciocínio — argumentos, alternativas consideradas, racional de cortes de escopo, conceitos discutidos. (Exploração técnica do pipeline fica em `etl/`.)
 
-Lê pra: entender por que o projeto é como é · retomar contexto em sessões futuras · justificar decisões em portfolio/entrevista · reproduzir o raciocínio em projetos futuros.
+Lê pra: entender o que o projeto é e por que é assim · retomar contexto em sessões futuras · justificar decisões em portfolio/entrevista · reproduzir o raciocínio em projetos futuros.
 
 ---
+
+## Referência consolidada
+
+- [spec.md](spec.md) — a especificação do projeto: o que é construído, arquitetura, patterns, domínio, escopo. Ponto de partida quando precisa lembrar do todo.
 
 ## Porta de entrada — justificativas das decisões
 

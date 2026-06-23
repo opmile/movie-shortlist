@@ -7,8 +7,7 @@ line-length = 100
 # O gate de qualidade mira o CORE DO PRODUTO (src/ + tests/), coerente com o CLAUDE.md
 # ("rigor no core POO; nenhum em etl/ scripts"). Fora do gate:
 extend-exclude = [
-  "etl",                                              # build-time, roda offline — não é produto
-  "filme.py", "catalogo.py", "main.py", "persistencia.py",  # app flat herdado, será substituído por src/shortlist/
+  "etl",  # build-time, roda offline — não é produto
 ]
 
 [tool.ruff.lint]
