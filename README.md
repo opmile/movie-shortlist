@@ -8,6 +8,8 @@ runtime — o produto consome só os snapshots.
 
 UI em Streamlit, 3 telas: **Acervo**, **Estatísticas**, **Recomendações**.
 
+🔗 **Demo ao vivo:** [movie-shortlist.streamlit.app](https://movie-shortlist.streamlit.app/)
+
 ## A tese
 
 As subclasses de `Filme` não foram inventadas a priori — **emergem da
