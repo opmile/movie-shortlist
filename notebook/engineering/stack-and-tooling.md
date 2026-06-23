@@ -104,15 +104,15 @@ shortlist/
 │   ├── test_factory.py
 │   └── test_recomendador.py
 ├── etl/                    # pipeline build-time — estrutura/uso em etl/README.md
-├── notebook/               # documentação de raciocínio (commitado)
+├── notebook/               # documentação do projeto (commitado)
+│   ├── spec.md             # spec consolidada (referência do projeto)
 │   ├── faq.md
 │   ├── data/
 │   └── engineering/
 ├── .venv/                  # gitignored
 ├── .gitignore
 ├── requirements.txt
-├── README.md               # instruções de execução pra avaliador
-└── spec.md                 # spec final do projeto
+└── README.md               # instruções de execução pra avaliador
 ```
 
 **Decisões pendentes:**

@@ -1,6 +1,6 @@
 # etl/ — pipeline build-time
 
-Referência canônica do pipeline: o que cada peça faz, como os dados fluem, o que sai e como regenerar. Os docs canônicos (`spec.md`, `notebook/`) carregam o **WHAT** e o **WHY**; **a estrutura e a operação do pipeline vivem aqui** — eles cross-refam este arquivo em vez de duplicar.
+Referência canônica do pipeline: o que cada peça faz, como os dados fluem, o que sai e como regenerar. A documentação do projeto vive em `notebook/` (`spec.md` + notas de raciocínio); **a estrutura e a operação do pipeline vivem aqui** — elas cross-refam este arquivo em vez de duplicar.
 
 ## Princípio: build-time vs run-time
 

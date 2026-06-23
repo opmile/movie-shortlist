@@ -3,6 +3,7 @@
 Filtros devolvem list[Filme] NOVA; nunca mutam a coleção interna (a instância é
 compartilhada entre reruns do Streamlit via @st.cache_resource — mutação vazaria).
 """
+
 from shortlist.domain import Filme
 
 
