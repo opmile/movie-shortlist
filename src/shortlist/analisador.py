@@ -1,7 +1,7 @@
 """Analisador — encapsula pandas. Converte list[Filme] → DataFrame uma vez e
 expõe métricas como tipos de domínio (dict/float). Ninguém fora vê DataFrame
-(exceção pragmática: distribuicao_notas devolve pd.Series, consumida direto pelo
-plot). media_/contagem_por_categoria agrupam por categoria() — a classificação
+(exceção pragmática: distribuicao_notas/_popularidade devolvem pd.Series,
+consumidas direto pelo plot). media_/contagem_por_categoria agrupam por categoria() — a classificação
 polimórfica do core reaparece na análise.
 """
 
@@ -27,6 +27,9 @@ class Analisador:
 
     def distribuicao_notas(self) -> pd.Series:
         return self._df["avg_rating"]
+
+    def distribuicao_popularidade(self) -> pd.Series:
+        return self._df["count"]
 
     def media_por_categoria(self) -> dict[str, float]:
         return self._df.groupby("categoria")["avg_rating"].mean().to_dict()

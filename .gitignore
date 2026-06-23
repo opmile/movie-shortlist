@@ -34,3 +34,5 @@ kaggle.json
 # IDE
 .vscode/
 .idea/
+
+.private/

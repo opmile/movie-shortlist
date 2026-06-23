@@ -10,6 +10,7 @@ vêm de .streamlit/config.toml (dois modos nativos); este módulo casa o CSS cus
 st.context.theme. Seletores `data-testid=...` acoplam ao Streamlit 1.58 (pinado).
 """
 
+import math
 import sys
 from pathlib import Path
 
@@ -25,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from shortlist.analisador import Analisador
 from shortlist.catalogo import Catalogo
 from shortlist.datasource import CSVDataSource
-from shortlist.factory import FilmeFactory
+from shortlist.factory import THRESHOLDS, FilmeFactory
 from shortlist.recomendador import (
     RecomendaPorGenero,
     RecomendaPorNota,
@@ -57,6 +58,9 @@ PAL = {
         "Filme": ("#2C2820", "#CFC7B4"),
     },
 }
+
+# Esconde a toolbar do plotly (câmera/zoom) — visual limpo pra leitura e screenshot.
+PLOTLY_CONFIG = {"displayModeBar": False}
 
 _CSS = """
 <style>
@@ -213,7 +217,33 @@ def tela_estatisticas(catalogo: Catalogo, pal: dict):
     _section("Distribuição de notas", "Onde o acervo se concentra.")
     fig = px.histogram(notas, nbins=30, color_discrete_sequence=[pal["primary"]])
     fig.update_layout(showlegend=False, xaxis_title="Nota", yaxis_title="Filmes")
-    st.plotly_chart(_style_fig(fig, pal), width="stretch")
+    st.plotly_chart(_style_fig(fig, pal), width="stretch", config=PLOTLY_CONFIG)
+
+    _section(
+        "Distribuição de popularidade",
+        "Os cortes que viram subclasse saem daqui — medidos, não inventados.",
+    )
+    # count varia de 1 a 81k: escala log pra ver a cauda, e as linhas marcam onde
+    # os thresholds (etl/core.py) recortam a distribuição em subclasses.
+    log_pop = a.distribuicao_popularidade().map(math.log10)
+    fig = px.histogram(log_pop, nbins=40, color_discrete_sequence=[pal["primary"]])
+    fig.update_layout(showlegend=False, xaxis_title="Votos por filme", yaxis_title="Filmes")
+    fig.update_xaxes(tickvals=[0, 1, 2, 3, 4, 5], ticktext=["1", "10", "100", "1k", "10k", "100k"])
+    for thr, rotulo in [
+        (THRESHOLDS["classico_count"], "Cult / Clássico ≥ 37"),
+        (THRESHOLDS["blockbuster_count"], "Blockbuster p95 = 1508"),
+    ]:
+        fig.add_vline(
+            x=math.log10(thr),
+            line_dash="dash",
+            line_color=pal["muted"],
+            annotation_text=rotulo,
+            annotation_position="top left",
+            annotation_font_color=pal["text"],
+        )
+    fig = _style_fig(fig, pal)
+    fig.update_layout(margin=dict(t=44))  # espaço pros rótulos dos cortes (acima do plot)
+    st.plotly_chart(fig, width="stretch", config=PLOTLY_CONFIG)
 
     col1, col2 = st.columns(2)
     with col1:
@@ -227,7 +257,7 @@ def tela_estatisticas(catalogo: Catalogo, pal: dict):
             color_discrete_map={c: pal["cat"].get(c, (pal["primary"], ""))[0] for c in cats},
         )
         fig.update_layout(showlegend=False, xaxis_title=None, yaxis_title="Nota média")
-        st.plotly_chart(_style_fig(fig, pal), width="stretch")
+        st.plotly_chart(_style_fig(fig, pal), width="stretch", config=PLOTLY_CONFIG)
     with col2:
         _section("Filmes por categoria", "O dispatch de threshold, visto de cima.")
         contagem = a.contagem_por_categoria()
@@ -239,7 +269,7 @@ def tela_estatisticas(catalogo: Catalogo, pal: dict):
             color_discrete_map={c: pal["cat"].get(c, (pal["primary"], ""))[0] for c in cats},
         )
         fig.update_layout(showlegend=False, xaxis_title=None, yaxis_title="Qtd")
-        st.plotly_chart(_style_fig(fig, pal), width="stretch")
+        st.plotly_chart(_style_fig(fig, pal), width="stretch", config=PLOTLY_CONFIG)
 
     _section("Ano × nota", "Filme mais novo não é filme melhor — veja a nuvem.")
     pontos = [(f.year, f.avg_rating) for f in catalogo.todos() if f.year is not None]
@@ -250,7 +280,7 @@ def tela_estatisticas(catalogo: Catalogo, pal: dict):
         opacity=0.35,
     )
     fig.update_layout(xaxis_title="Ano", yaxis_title="Nota")
-    st.plotly_chart(_style_fig(fig, pal), width="stretch")
+    st.plotly_chart(_style_fig(fig, pal), width="stretch", config=PLOTLY_CONFIG)
 
 
 def tela_recomendacoes(catalogo: Catalogo, pal: dict):
