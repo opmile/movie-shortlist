@@ -157,8 +157,8 @@ def _linhas(filmes):
             "Título": f.title,
             "Ano": f.year,
             "Categoria": f.categoria(),
-            "Nota": round(f.avg_rating, 2),
-            "Nota ajustada": round(f.weighted_rating, 2),
+            "Nota": f.avg_rating,
+            "Nota ajustada": f.weighted_rating,
             "Votos": f.count,
         }
         for f in filmes
@@ -176,31 +176,54 @@ def _tabela(filmes, pal: dict) -> None:
         bg, fg = cat.get(v, (pal["surface"], pal["text"]))
         return f"background-color:{bg}; color:{fg}; font-weight:600;"
 
-    sty = df.style.map(_badge, subset=["Categoria"])
+    sty = df.style.map(_badge, subset=["Categoria"]).format(
+        {"Ano": "{:.0f}", "Nota": "{:.2f}", "Nota ajustada": "{:.2f}"},
+        na_rep="—",
+    )
     st.dataframe(sty, width="stretch", hide_index=True)
 
 
 def tela_acervo(catalogo: Catalogo, pal: dict):
-    _section("Explorar o acervo", "Filtre por gênero, categoria ou título.")
+    _section("Explorar o acervo", "Filtre por gênero, categoria, ano ou título.")
     generos = sorted({g for f in catalogo.todos() for g in f.genres})
     categorias = sorted({f.categoria() for f in catalogo.todos()})
+    anos = sorted({f.year for f in catalogo.todos() if f.year is not None})
+    ano_min, ano_max = anos[0], anos[-1]
 
-    col1, col2, col3 = st.columns(3)
-    genero = col1.selectbox("Gênero", ["(todos)"] + generos)
-    categoria = col2.selectbox("Categoria", ["(todas)"] + categorias)
-    termo = col3.text_input("Buscar título")
+    termo = st.text_input(
+        "Buscar",
+        placeholder="Título — ex. Matrix, Cidade de Deus, Parasita…",
+    )
+    col1, col2 = st.columns(2)
+    genero = col1.selectbox("Gênero", generos, index=None, placeholder="Todos os gêneros")
+    categoria = col2.selectbox(
+        "Categoria", categorias, index=None, placeholder="Todas as categorias"
+    )
+    ano_de = st.slider("A partir do ano", ano_min, ano_max, ano_min)
 
     filmes = catalogo.todos()
-    if genero != "(todos)":
+    if genero:
         filmes = [f for f in filmes if genero in f.genres]
-    if categoria != "(todas)":
+    if categoria:
         filmes = [f for f in filmes if f.categoria() == categoria]
+    if ano_de > ano_min:
+        filmes = [f for f in filmes if f.year is not None and f.year >= ano_de]
     if termo:
         t = termo.lower()
         filmes = [f for f in filmes if t in f.title.lower()]
 
-    st.caption(f"{_br(len(filmes))} filme(s) no recorte · mostrando até 500")
-    _tabela(filmes[:500], pal)
+    filmes = sorted(filmes, key=lambda f: f.weighted_rating, reverse=True)
+
+    por_pag = 50
+    n_pags = math.ceil(len(filmes) / por_pag) or 1
+
+    cap = st.empty()
+    _, c, _ = st.columns([2, 1, 2])
+    pag = c.number_input("Página", 1, n_pags, 1, label_visibility="collapsed")
+    ini = (pag - 1) * por_pag
+    cap.caption(f"{_br(len(filmes))} filme(s) · página {pag}/{n_pags}")
+
+    _tabela(filmes[ini : ini + por_pag], pal)
 
 
 def tela_estatisticas(catalogo: Catalogo, pal: dict):
