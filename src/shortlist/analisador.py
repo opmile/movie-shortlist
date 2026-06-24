@@ -1,8 +1,8 @@
 """Analisador — encapsula pandas. Converte list[Filme] → DataFrame uma vez e
 expõe métricas como tipos de domínio (dict/float). Ninguém fora vê DataFrame
 (exceção pragmática: distribuicao_notas/_popularidade devolvem pd.Series,
-consumidas direto pelo plot). media_/contagem_por_categoria agrupam por categoria() — a classificação
-polimórfica do core reaparece na análise.
+consumidas direto pelo plot). media_/contagem_por_categoria agrupam por
+categoria() — a classificação polimórfica do core reaparece na análise.
 """
 
 import pandas as pd
